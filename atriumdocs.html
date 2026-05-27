@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atrium: Protocol Documentation</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f4f3ee;
+    --text: #1a1a1a;
+    --text-2: #5f5e5a;
+    --text-3: #888780;
+    --border: rgba(0,0,0,0.08);
+    --border-2: rgba(0,0,0,0.15);
+    --accent: #185FA5;
+    --accent-bg: #E6F1FB;
+    --success: #3B6D11;
+    --success-bg: #EAF3DE;
+    --warning: #854F0B;
+    --warning-bg: #FAEEDA;
+    --danger: #A32D2D;
+    --danger-bg: #FCEBEB;
+    --purple: #534AB7;
+    --purple-bg: #EEEDFE;
+    --teal: #0F6E56;
+    --teal-bg: #E1F5EE;
+    --pink: #993556;
+    --pink-bg: #FBEAF0;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --surface: #242422;
+      --surface-2: #2e2e2c;
+      --text: #f1efe8;
+      --text-2: #b4b2a9;
+      --text-3: #888780;
+      --border: rgba(255,255,255,0.1);
+      --border-2: rgba(255,255,255,0.2);
+      --accent: #85B7EB;
+      --accent-bg: #0C447C;
+      --success: #97C459;
+      --success-bg: #27500A;
+      --warning: #FAC775;
+      --warning-bg: #633806;
+      --danger: #F09595;
+      --danger-bg: #791F1F;
+      --purple: #AFA9EC;
+      --purple-bg: #3C3489;
+      --teal: #5DCAA5;
+      --teal-bg: #085041;
+      --pink: #ED93B1;
+      --pink-bg: #72243E;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 0.5px solid var(--border-2);
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    color: var(--text-2);
+    font-size: 15px;
+  }
+  .badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .badge-info { background: var(--accent-bg); color: var(--accent); }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning); }
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 2rem;
+    padding: 4px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    width: fit-content;
+    flex-wrap: wrap;
+  }
+  nav.tabs button {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-2);
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  nav.tabs button:hover { color: var(--text); }
+  nav.tabs button.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.2s ease-out; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 500;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 500;
+    margin: 1.5rem 0 0.75rem;
+  }
+  h4 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 1rem 0 0.5rem;
+  }
+  p { margin-bottom: 0.75rem; color: var(--text-2); }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  pre {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--surface-2);
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    margin: 12px 0;
+    overflow-x: auto;
+    color: var(--text);
+    line-height: 1.55;
+    border-left: 3px solid var(--accent);
+  }
+  .section {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 1rem 0;
+  }
+  .card {
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .card-label {
+    font-size: 12px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .card-value {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--text-2);
+    margin-top: 4px;
+  }
+  .stepper { margin: 1.5rem 0; }
+  .step-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .step-dot {
+    background: transparent;
+    border: 0.5px solid var(--border-2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-2);
+    transition: all 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .step-dot.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .step-dot:hover:not(.active) {
+    border-color: var(--text);
+    color: var(--text);
+  }
+  .step-panel {
+    display: none;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    min-height: 200px;
+  }
+  .step-panel.active { display: block; }
+  .step-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-title i { color: var(--accent); font-size: 20px; }
+  .step-body { color: var(--text-2); }
+  .step-actor {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: var(--text-3);
+    font-weight: 500;
+  }
+  .code-line {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--surface-2);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+    overflow-x: auto;
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+  }
+  .step-nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .btn {
+    background: var(--surface);
+    border: 0.5px solid var(--border-2);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.15s;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 1rem 0;
+  }
+  .module {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .module-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .mi-cdo { background: var(--accent-bg); color: var(--accent); }
+  .mi-tranche { background: var(--teal-bg); color: var(--teal); }
+  .mi-strategy { background: var(--purple-bg); color: var(--purple); }
+  .mi-accounting { background: var(--warning-bg); color: var(--warning); }
+  .mi-cooldown { background: var(--pink-bg); color: var(--pink); }
+  .mi-acm { background: var(--success-bg); color: var(--success); }
+  .module-name { font-weight: 500; font-size: 15px; }
+  .module-role { font-size: 12px; color: var(--text-3); }
+  .module-desc { font-size: 14px; color: var(--text-2); margin-top: 8px; }
+  .module-list {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 0.5px dashed var(--border);
+  }
+  .module-list li {
+    font-size: 13px;
+    color: var(--text-2);
+    padding: 3px 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .module-list li i { font-size: 14px; color: var(--text-3); }
+  .alert {
+    background: var(--warning-bg);
+    color: var(--warning);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin: 12px 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .alert i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .alert-info { background: var(--accent-bg); color: var(--accent); }
+  .alert-success { background: var(--success-bg); color: var(--success); }
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .info-table th, .info-table td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .info-table th {
+    font-weight: 500;
+    color: var(--text-3);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+  .info-table code { font-size: 12px; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .pill-jr { background: var(--danger-bg); color: var(--danger); }
+  .pill-mz { background: var(--warning-bg); color: var(--warning); }
+  .pill-sr { background: var(--accent-bg); color: var(--accent); }
+  .pill-success { background: var(--success-bg); color: var(--success); }
+  .arch-diagram {
+    background: var(--surface-2);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+  .layer {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin: 8px 0;
+  }
+  .layer-name { font-weight: 500; font-size: 13px; color: var(--text-2); }
+  .layer-body {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .chip {
+    background: var(--surface-2);
+    border: 0.5px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .arrow {
+    text-align: center;
+    color: var(--text-3);
+    font-size: 18px;
+    margin: 2px 0;
+  }
+  ul.bullets { padding-left: 1.25rem; margin: 0.5rem 0; }
+  ul.bullets li { color: var(--text-2); margin: 4px 0; font-size: 14px; }
+  .case-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin: 12px 0;
+  }
+  .case-label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .case-1 { background: var(--success-bg); color: var(--success); }
+  .case-2 { background: var(--danger-bg); color: var(--danger); }
+  .formula-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  @media (max-width: 700px) {
+    .formula-grid { grid-template-columns: 1fr; }
+  }
+  .formula-card {
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .formula-card .card-label {
+    margin-bottom: 6px;
+  }
+  .formula-card .formula {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Atrium</h1>
+  <p class="subtitle">A 3-tranche principal-first primitive for on-chain RWA and yield-bearing stablecoins, targeting institutional LPs. Senior principal is denominated in USD rather than the staked underlying, with risk-premium structurally routed down to Mezzanine and Junior.</p>
+  <div class="badges">
+    <span class="badge badge-success">3-tranche structure</span>
+    <span class="badge badge-warning">Arbitrum Mainnet</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" data-tab="overview"><i class="ti ti-layout-dashboard"></i> Overview</button>
+  <button class="tab-btn" data-tab="architecture"><i class="ti ti-stack-2"></i> Architecture</button>
+  <button class="tab-btn" data-tab="modules"><i class="ti ti-components"></i> Modules</button>
+  <button class="tab-btn" data-tab="accounting"><i class="ti ti-calculator"></i> Accounting</button>
+  <button class="tab-btn" data-tab="user-flows"><i class="ti ti-user"></i> User flows</button>
+  <button class="tab-btn" data-tab="admin-flows"><i class="ti ti-shield-lock"></i> Admin flows</button>
+  <button class="tab-btn" data-tab="glossary"><i class="ti ti-book"></i> Glossary</button>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     OVERVIEW
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="overview" class="panel active">
+  <div class="section">
+    <h2>What is Atrium?</h2>
+    <p>A 3-tranche principal-first primitive for on-chain RWA and yield-bearing stablecoins, targeting institutional LPs. Senior principal is denominated in USD rather than the staked underlying, with risk-premium structurally routed down to Mezzanine and Junior.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-label">Underlying yield</div>
+        <div class="card-value">USD.AI</div>
+        <div class="card-sub">GPU-backed loans (10–15% APR)</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Tranches</div>
+        <div class="card-value">3</div>
+        <div class="card-sub">Senior, Mezzanine, Junior</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Standard</div>
+        <div class="card-value">ERC-4626</div>
+        <div class="card-sub">Each tranche is a vault</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Min coverage</div>
+        <div class="card-value">1.05×</div>
+        <div class="card-sub">Pool / Senior TVL ratio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Tranche risk profile</h3>
+    <table class="info-table">
+      <thead>
+        <tr><th>Tranche</th><th>Loss order</th><th>Yield priority</th><th>Target users</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-jr">Junior</span></td>
+          <td>First loss</td>
+          <td>Residual + priority RP share (α-weighted)</td>
+          <td>Risk-on yield seekers</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-mz">Mezzanine</span></td>
+          <td>Second loss</td>
+          <td>Residual + proportional RP share</td>
+          <td>Balanced exposure</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-sr">Senior</span></td>
+          <td>Last loss (structurally protected)</td>
+          <td>Target APY first (USD-denominated)</td>
+          <td>Institutional LPs, capital preservation</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Losses absorb in order Junior → Mezzanine → Senior. Yield distributes in reverse: Senior receives <code>Sr_yield_target</code> first, residual splits between Mezzanine and Junior with Junior receiving a priority-weighted share of the Risk Premium.</p>
+  </div>
+
+  <div class="section">
+    <h3>Key mechanisms</h3>
+    <div class="module-grid">
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-cdo"><i class="ti ti-shield-check"></i></div>
+          <div>
+            <div class="module-name">Coverage gate</div>
+            <div class="module-role">Risk circuit-breaker</div>
+          </div>
+        </div>
+        <div class="module-desc">Pauses Senior mint when <code>CR_SR &lt; 1.05×</code>. Subordinate withdrawal remains available via SHARES_LOCK.</div>
+      </div>
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-cooldown"><i class="ti ti-clock-hour-4"></i></div>
+          <div>
+            <div class="module-name">SHARES_LOCK cooldown</div>
+            <div class="module-role">Bank-run protection</div>
+          </div>
+        </div>
+        <div class="module-desc">Time-locked withdraw queue with coverage-driven duration. Two tiers: short (3d) and long (7d), gated by CR_SR.</div>
+      </div>
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-strategy"><i class="ti ti-stack-3"></i></div>
+          <div>
+            <div class="module-name">Auto-stake</div>
+            <div class="module-role">Yield optimisation</div>
+          </div>
+        </div>
+        <div class="module-desc">USDai deposits auto-stake into sUSDai. Protocol always holds yield-bearing form.</div>
+      </div>
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-accounting"><i class="ti ti-calculator"></i></div>
+          <div>
+            <div class="module-name">Dynamic Risk Premium</div>
+            <div class="module-role">Self-balancing incentive</div>
+          </div>
+        </div>
+        <div class="module-desc">Senior's payout to sub scales with capital structure thickness. Thin sub → higher RP attracts capital. Thick sub → RP tapers.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     ARCHITECTURE
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="architecture" class="panel">
+  <div class="section">
+    <h2>Module dependency graph</h2>
+    <p>Atrium implements a modular structured-credit architecture with strict separation of concerns. Each module has a single responsibility and communicates through interfaces enforced by AccessControlManager.</p>
+    <div class="arch-diagram">
+      <div class="layer">
+        <div class="layer-name">No dependencies</div>
+        <div class="layer-body">
+          <span class="chip">AccessControlManager (ACM)</span>
+        </div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer">
+        <div class="layer-name">Depends on ACM</div>
+        <div class="layer-body">
+          <span class="chip">AccessControlled</span>
+          <span class="chip">CDOComponent</span>
+        </div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer">
+        <div class="layer-name">Depends on AccessControlled</div>
+        <div class="layer-body">
+          <span class="chip">AtriumCDO</span>
+          <span class="chip">Tranche</span>
+          <span class="chip">Strategy</span>
+          <span class="chip">Accounting</span>
+          <span class="chip">CooldownBase</span>
+        </div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="layer">
+        <div class="layer-name">Concrete contracts</div>
+        <div class="layer-body">
+          <span class="chip">UsdaiStrategy</span>
+          <span class="chip">SharesCooldown</span>
+          <span class="chip">ERC20Cooldown</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>USD.AI Market deployment</h3>
+    <pre>USD.AI Market: Arbitrum Mainnet (Chain ID 42161)
+
+  srUSDai ──┐
+  mzUSDai ──┼──► AtriumCDO ──► UsdaiStrategy ──► sUSDai vault
+  jrUSDai ──┘         │
+                      ├──► Accounting
+                      │      TVL per tranche · reserve bucket
+                      │      updateAccounting · _splitGain · loss waterfall
+                      │
+                      ├──► SharesCooldown
+                      │      CR-aware exit modes (3 ranges)
+                      │      NAV floats during lock · claim at current rate
+                      │
+                      ├──► ERC20Cooldown  (optional · sUSDai-side)
+                      │
+                      └──► AccessControlManager (ACM)
+
+Shared: AtriumGovernor · multisig + 48-hour timelock</pre>
+  </div>
+
+  <div class="section">
+    <h3>Roles</h3>
+    <table class="info-table">
+      <thead>
+        <tr><th>Role</th><th>Holder</th><th>Permissions</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>DEFAULT_ADMIN_ROLE</code></td><td>Admin multisig</td><td>Grant and revoke roles; upgrade ACM</td></tr>
+        <tr><td><code>PAUSER_ROLE</code></td><td>Pauser multisig</td><td>Pause deposits and withdrawals via setActionStates</td></tr>
+        <tr><td><code>UPDATER_CDO_APR_ROLE</code></td><td>Risk team multisig</td><td>Update tranche APR, cooldown ranges, exit fees</td></tr>
+        <tr><td><code>UPDATER_STRAT_CONFIG_ROLE</code></td><td>Strategy config team</td><td>Update Strategy cooldown durations per tranche</td></tr>
+        <tr><td><code>RESERVE_MANAGER_ROLE</code></td><td>Treasury multisig</td><td>Drain protocol reserve to treasury via reduceReserve</td></tr>
+        <tr><td><code>COOLDOWN_WORKER_ROLE</code></td><td>UsdaiStrategy contract</td><td>Trigger transfers from ERC20Cooldown silo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     MODULES
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="modules" class="panel">
+  <div class="section">
+    <h2>Module specifications</h2>
+    <p>Per-market contracts deployed for the USD.AI market. Shared infrastructure (ACM, governor) is deployed once.</p>
+
+    <div class="module-grid">
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-cdo"><i class="ti ti-network"></i></div>
+          <div>
+            <div class="module-name">AtriumCDO</div>
+            <div class="module-role">Core orchestrator</div>
+          </div>
+        </div>
+        <div class="module-desc">Routes deposits and withdrawals across three Tranche instances. Triggers Accounting on each TVL update. Holds component wiring and reserve treasury reference.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> config (wire components)</li>
+          <li><i class="ti ti-arrow-right"></i> setActionStates (pause)</li>
+          <li><i class="ti ti-arrow-right"></i> reduceReserve</li>
+          <li><i class="ti ti-arrow-right"></i> setSharesCooldown</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-tranche"><i class="ti ti-coin"></i></div>
+          <div>
+            <div class="module-name">Tranche (×3)</div>
+            <div class="module-role">User-facing vault</div>
+          </div>
+        </div>
+        <div class="module-desc">ERC-4626 vault per tranche kind. Three deployed instances: Sr / Mz / Jr generic contract. Multi-token deposit and withdraw with mode routing. MIN_SHARES protection.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> deposit / mint (USDai or sUSDai)</li>
+          <li><i class="ti ti-arrow-right"></i> withdraw / redeem (modes)</li>
+          <li><i class="ti ti-arrow-right"></i> TRedemptionParams guard</li>
+          <li><i class="ti ti-arrow-right"></i> MIN_SHARES protection</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-accounting"><i class="ti ti-calculator"></i></div>
+          <div>
+            <div class="module-name">Accounting</div>
+            <div class="module-role">State holder</div>
+          </div>
+        </div>
+        <div class="module-desc">Pure state contract. TVL per tranche, reserve bucket, yield split, loss waterfall. No funds, only numbers.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> updateAccounting</li>
+          <li><i class="ti ti-arrow-right"></i> updateBalanceFlow</li>
+          <li><i class="ti ti-arrow-right"></i> accrueFee</li>
+          <li><i class="ti ti-arrow-right"></i> totalAssetsT0 (snapshot)</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-strategy"><i class="ti ti-trending-up"></i></div>
+          <div>
+            <div class="module-name">UsdaiStrategy</div>
+            <div class="module-role">Yield source</div>
+          </div>
+        </div>
+        <div class="module-desc">Holds sUSDai (USD.AI's ERC4626 yield-bearing token). USDai deposits auto-stake. Withdraws release sUSDai.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> deposit (USDai or sUSDai)</li>
+          <li><i class="ti ti-arrow-right"></i> withdraw (sUSDai only)</li>
+          <li><i class="ti ti-arrow-right"></i> totalAssets (sUSDai.previewRedeem)</li>
+          <li><i class="ti ti-arrow-right"></i> setCooldowns</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-cooldown"><i class="ti ti-clock-hour-4"></i></div>
+          <div>
+            <div class="module-name">SharesCooldown</div>
+            <div class="module-role">Tranche-share silo</div>
+          </div>
+        </div>
+        <div class="module-desc">Holds tranche vault shares during withdraw cooldown. Two duration tiers driven by CR_SR. NAV floats during lock.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> requestRedeem</li>
+          <li><i class="ti ti-arrow-right"></i> finalize</li>
+          <li><i class="ti ti-arrow-right"></i> cancel (free)</li>
+          <li><i class="ti ti-arrow-right"></i> calculateExitParams</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-cooldown"><i class="ti ti-clock-hour-3"></i></div>
+          <div>
+            <div class="module-name">ERC20Cooldown</div>
+            <div class="module-role">Strategy-side silo</div>
+          </div>
+        </div>
+        <div class="module-desc">Optional sUSDai release delay at strategy layer. Default cooldown = 0 (instant pass-through). Owner can activate for emergencies.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> transfer (with optional lock)</li>
+          <li><i class="ti ti-arrow-right"></i> finalize</li>
+          <li><i class="ti ti-arrow-right"></i> setCooldownDisabled</li>
+          <li><i class="ti ti-arrow-right"></i> per-token granularity</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-acm"><i class="ti ti-key"></i></div>
+          <div>
+            <div class="module-name">AccessControlManager</div>
+            <div class="module-role">Permission registry</div>
+          </div>
+        </div>
+        <div class="module-desc">Single UUPS upgradeable contract. Stores role mappings and per-call ACL. All consumer contracts query via AccessControlled.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> hasRole / grantRole</li>
+          <li><i class="ti ti-arrow-right"></i> isAllowedToCall / grantCall</li>
+          <li><i class="ti ti-arrow-right"></i> wildcard namespace</li>
+        </ul>
+      </div>
+
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon mi-acm"><i class="ti ti-lock"></i></div>
+          <div>
+            <div class="module-name">AccessControlled</div>
+            <div class="module-role">Abstract base</div>
+          </div>
+        </div>
+        <div class="module-desc">Inherited by all permission-aware contracts. Provides onlyRole modifier and reentrancy guard. Holds reference to ACM.</div>
+        <ul class="module-list">
+          <li><i class="ti ti-arrow-right"></i> onlyRole(role)</li>
+          <li><i class="ti ti-arrow-right"></i> _checkAccessAllowed(sig)</li>
+          <li><i class="ti ti-arrow-right"></i> nonReentrant</li>
+          <li><i class="ti ti-arrow-right"></i> Role constants exposed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     ACCOUNTING
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="accounting" class="panel">
+  <div class="section">
+    <h2>Accounting model</h2>
+    <p>The Accounting module is a pure state contract that computes yield distribution and loss waterfall at every <code>updateAccounting</code> call. All formulas are conservation-enforced: <code>Y_sr + Y_mz + Y_jr = netGain</code> at every settlement.</p>
+
+    <div class="alert alert-info">
+      <i class="ti ti-info-circle"></i>
+      <div>Both <code>RP_nominal</code> and <code>RP_delivered</code> are tracked. When <code>floor_sr</code> is active, Senior receives the floor and the actual RP flowing to sub is reduced below nominal. The <code>MAX(0, …)</code> construction in RP_delivered handles this automatically, no separate floor-on / floor-off branch.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Variable definitions</h3>
+    <table class="info-table">
+      <thead>
+        <tr><th>Variable</th><th>Definition</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>TVL_sr</code></td><td>Senior tranche TVL (USDai)</td><td>Accounting state</td></tr>
+        <tr><td><code>TVL_mz</code></td><td>Mezzanine tranche TVL (USDai)</td><td>Accounting state</td></tr>
+        <tr><td><code>TVL_jr</code></td><td>Junior tranche TVL (USDai)</td><td>Accounting state</td></tr>
+        <tr><td><code>pool</code></td><td><code>TVL_sr + TVL_mz + TVL_jr</code></td><td>Total protocol TVL</td></tr>
+        <tr><td><code>sub</code></td><td><code>TVL_mz + TVL_jr</code></td><td>Subordinate pool TVL</td></tr>
+        <tr><td><code>totalAssets</code></td><td><code>sUSDai.previewRedeem(held)</code></td><td>USDai value of all deposits</td></tr>
+        <tr><td><code>GrossBaseAPY</code></td><td>Raw sUSDai snapshot APY</td><td>Annualised from exchange rate delta</td></tr>
+        <tr><td><code>BaseAPY</code></td><td><code>GrossBaseAPY × (1 − reserveBps / 10000)</code></td><td>Distributable APY after reserve</td></tr>
+        <tr><td><code>netGain</code></td><td><code>BaseAPY × pool</code></td><td>Total distributable yield</td></tr>
+        <tr><td><code>floor_sr</code></td><td>Senior minimum yield</td><td>Governance, 48-hour timelock</td></tr>
+        <tr><td><code>RP_nominal</code></td><td><code>x_sr + y_sr × (TVL_sr / pool)^k_sr</code></td><td>RP rate from curve</td></tr>
+        <tr><td><code>APY_sr_target</code></td><td><code>MAX(floor_sr, BaseAPY × (1 − RP_nominal))</code></td><td>Senior target APY</td></tr>
+        <tr><td><code>Sr_yield_target</code></td><td><code>APY_sr_target × TVL_sr</code></td><td>Senior priority claim</td></tr>
+        <tr><td><code>RP_delivered</code></td><td><code>MAX(0, (BaseAPY − APY_sr_target) × TVL_sr)</code></td><td>RP actually flowing to sub</td></tr>
+        <tr><td><code>α (alpha)</code></td><td>Junior priority multiplier</td><td>Default 2.5×, governance-tunable</td></tr>
+        <tr><td><code>share_jr</code></td><td><code>(α × TVL_jr) / (α × TVL_jr + TVL_mz)</code></td><td>Junior's RP share</td></tr>
+        <tr><td><code>share_mz</code></td><td><code>TVL_mz / (α × TVL_jr + TVL_mz)</code></td><td>Mezzanine's RP share</td></tr>
+        <tr><td><code>CR_SR</code></td><td><code>pool / TVL_sr</code></td><td>Coverage ratio</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Risk Premium curve</h3>
+    <p>Senior pays a risk premium to the subordinate pool. RP_nominal scales with Senior's concentration: when Senior is a large share of the pool (thin sub below it), it pays more. When sub is thick, RP tapers. This creates a self-correcting incentive that attracts sub capital when protection is thin.</p>
+
+    <pre>TVLRatio_sr = TVL_sr / pool
+RP_nominal  = x_sr + y_sr × TVLRatio_sr ^ k_sr</pre>
+
+    <table class="info-table">
+      <thead>
+        <tr><th>Parameter</th><th>Default</th><th>Design intent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>x_sr</code> (baseline)</td><td>15%</td><td>Minimum premium Senior always pays</td></tr>
+        <tr><td><code>y_sr</code> (variable)</td><td>20%</td><td>Sensitivity to Senior concentration</td></tr>
+        <tr><td><code>k_sr</code> (curvature)</td><td>0.3</td><td>Concave curve. Rapid response at low TVLRatio_sr, plateau at high.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>RP distribution weights</h3>
+    <p>RP_delivered is split between Mezzanine and Junior using priority-weighted shares. Junior's weight is multiplied by α to compensate for first-loss exposure. Mezzanine receives its proportional share without the multiplier.</p>
+
+    <pre>share_jr = (α × TVL_jr) / (α × TVL_jr + TVL_mz)
+share_mz = TVL_mz / (α × TVL_jr + TVL_mz)
+
+// Conservation: share_jr + share_mz = 1
+// With α = 2.0 and TVL_mz = TVL_jr → share_jr = 66.7%, share_mz = 33.3%
+// With α = 1.0 (no priority) → shares match TVL proportions</pre>
+  </div>
+
+  <div class="section">
+    <h3>Reserve cut</h3>
+    <pre>reserveCut = strategyGain × reserveBps / 10000   // only when strategyGain > 0
+netGain    = strategyGain − reserveCut
+BaseAPY    = GrossBaseAPY × (1 − reserveBps / 10000)
+
+// Reserve cut applies only on positive gains.
+// Default reserveBps = 500 (5%).</pre>
+  </div>
+
+  <div class="section">
+    <h3>Case classification</h3>
+    <p>Distribution path is determined by comparing netGain against Senior's yield target:</p>
+    <pre>Case 1: netGain ≥ Sr_yield_target
+Case 2: netGain &lt;  Sr_yield_target</pre>
+
+    <div class="case-card">
+      <span class="case-label case-1">Case 1: Sr target met</span>
+      <p>NetGain is sufficient to cover Senior's target. The subordinate pool receives the residual. In the ideal case, <code>Sub_APY = BaseAPY</code>. When <code>floor_sr</code> is active and <code>RP_delivered</code> drops to zero, Sub_APY can fall below BaseAPY, the system is in the yield-compressed sub-case.</p>
+      <pre>Step 1, Senior
+   Y_sr = Sr_yield_target
+
+Step 2, Sub pool
+   Sub_yield_total = netGain − Sr_yield_target − RP_delivered
+   Sub_APY         = Sub_yield_total / sub
+
+Step 3, Mezzanine and Junior
+   Y_mz = Sub_APY × TVL_mz + share_mz × RP_delivered
+   Y_jr = Sub_APY × TVL_jr + share_jr × RP_delivered
+
+// Ideal case  : Sub_APY = BaseAPY, hierarchy APY_sr ≤ BaseAPY &lt; APY_mz &lt; APY_jr
+// Compressed  : Sub_APY &lt; BaseAPY; when RP_delivered = 0 → APY_mz = APY_jr = Sub_APY
+
+Conservation: Y_sr + Y_mz + Y_jr = netGain</pre>
+    </div>
+
+    <div class="case-card">
+      <span class="case-label case-2">Case 2: Sr target not met</span>
+      <p>NetGain is insufficient to cover Senior's target. The sub pool absorbs the deficit through the loss waterfall: Junior yield first, then Junior principal, then Mezzanine yield, then Mezzanine principal. Senior is impaired only in extreme cases where the sub pool is fully exhausted.</p>
+      <pre>Step 1, Compute deficit and total absorb
+   deficit      = Sr_yield_target − netGain
+   total_absorb = deficit + BaseAPY × sub
+   // covers (a) deficit Sr needs and (b) sub yield base
+
+Step 2, Compute capacities
+   Jr_capacity = MAX(0, TVL_jr × (1 + BaseAPY))
+   Mz_capacity = MAX(0, TVL_mz × (1 + BaseAPY))
+   // remaining value of tranche after BaseAPY
+
+Step 3, Apply waterfall
+   jr_absorb = MIN(total_absorb, Jr_capacity)
+   mz_absorb = MIN(total_absorb − jr_absorb, Mz_capacity)
+   sr_loss   = total_absorb − jr_absorb − mz_absorb  // > 0 only in extreme
+
+Step 4, Final yields
+   Y_sr = Sr_yield_target − sr_loss
+   Y_mz = BaseAPY × TVL_mz − mz_absorb
+   Y_jr = BaseAPY × TVL_jr − jr_absorb
+
+Conservation: Y_sr + Y_mz + Y_jr = netGain</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Coverage ratio and cooldown</h3>
+    <p>CR_SR is the primary health indicator. Mezzanine and Junior share the same cooldown logic, there is no Mz-specific coverage metric because Mz is not protected by Jr with respect to yield.</p>
+
+    <table class="info-table">
+      <thead>
+        <tr><th>State</th><th>CR_SR</th><th>Senior</th><th>Mezzanine</th><th>Junior</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-success">Normal</span></td>
+          <td>&gt; 1.20×</td>
+          <td>NONE (instant)</td>
+          <td>NONE (instant)</td>
+          <td>NONE (instant)</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-mz">Monitoring</span></td>
+          <td>1.10–1.20×</td>
+          <td>NONE (instant)</td>
+          <td>SHARES_LOCK (3d)</td>
+          <td>SHARES_LOCK (3d)</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-jr">Warning</span></td>
+          <td>&lt; 1.10×</td>
+          <td>NONE (instant)</td>
+          <td>SHARES_LOCK (7d)</td>
+          <td>SHARES_LOCK (7d)</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-jr">Critical</span></td>
+          <td>&lt; 1.05×</td>
+          <td>Mint paused</td>
+          <td>SHARES_LOCK (7d)</td>
+          <td>SHARES_LOCK (7d)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <i class="ti ti-info-circle"></i>
+      <div>Atrium uses a single cooldown mechanism: <strong>SHARES_LOCK</strong>. The previous two-mode design (ASSETS_LOCK + SHARES_LOCK) is replaced by a single mode with two duration tiers gated on CR_SR. Senior withdrawal is always NONE, hardcoded invariant.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Numerical examples</h3>
+    <p>Base parameters: <code>TVL_sr = $30M · TVL_mz = $5M · TVL_jr = $5M · pool = $40M · CR_SR = 1.33×</code> · <code>floor_sr = 3.5%</code> · <code>x_sr = 15%, y_sr = 20%, k_sr = 0.3</code> · <code>α = 2.5</code> · <code>reserveBps = 500</code>.</p>
+    <p>Derived constants: <code>TVLRatio_sr = 0.75</code> · <code>RP_nominal = 15% + 20% × 0.75^0.3 = 33.35%</code> · <code>share_jr = 71.4% / share_mz = 28.6%</code>.</p>
+
+    <h4>Scenario 1, Normal yield (GrossBaseAPY = 10%)</h4>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <div class="card-label">Inputs</div>
+        <div class="formula">BaseAPY = 9.50%<br>netGain = $3.800M<br>APY_sr_formula = 6.33%<br>APY_sr_target = 6.33%<br>Sr_yield_target = $1.900M</div>
+      </div>
+      <div class="formula-card">
+        <div class="card-label">Outputs</div>
+        <div class="formula">Case 1<br>RP_delivered = $0.950M<br>Sub_APY = 9.50%<br>APY_sr / mz / jr = 6.33% / 14.93% / 23.08%<br>Conservation ✓</div>
+      </div>
+    </div>
+
+    <h4>Scenario 2, Yield compressed (GrossBaseAPY = 3%)</h4>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <div class="card-label">Inputs</div>
+        <div class="formula">BaseAPY = 2.85%<br>netGain = $1.140M<br>APY_sr_formula = 1.90%<br>APY_sr_target = 3.50% (floor)<br>Sr_yield_target = $1.050M</div>
+      </div>
+      <div class="formula-card">
+        <div class="card-label">Outputs</div>
+        <div class="formula">Case 1, compressed<br>RP_delivered = $0<br>Sub_APY = 0.90%<br>APY_sr / mz / jr = 3.50% / 0.90% / 0.90%<br>Conservation ✓</div>
+      </div>
+    </div>
+
+    <h4>Scenario 3, Sub principal loss (GrossBaseAPY = 1%)</h4>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <div class="card-label">Inputs</div>
+        <div class="formula">BaseAPY = 0.95%<br>netGain = $0.380M<br>floor_sr = 3.50% (active hard)<br>Sr_yield_target = $1.050M<br>deficit = $0.670M</div>
+      </div>
+      <div class="formula-card">
+        <div class="card-label">Outputs</div>
+        <div class="formula">Case 2<br>total_absorb = $0.765M<br>jr_absorb = $0.765M (fits Jr_cap)<br>APY_sr / mz / jr = 3.50% / 0.95% / −14.35%<br>Conservation ✓</div>
+      </div>
+    </div>
+
+    <h4>Scenario 4, Severe depeg (GrossBaseAPY = −30%)</h4>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <div class="card-label">Inputs</div>
+        <div class="formula">BaseAPY = −28.50%<br>netGain = −$11.40M<br>Sr_yield_target = $1.050M<br>deficit = $12.45M<br>total_absorb = $9.60M</div>
+      </div>
+      <div class="formula-card">
+        <div class="card-label">Outputs</div>
+        <div class="formula">Case 2, sub wiped, Sr impaired<br>Jr_cap = Mz_cap = $3.575M<br>jr_absorb = mz_absorb = $3.575M<br>sr_loss = $2.45M<br>APY_sr / mz / jr = −4.67% / −100% / −100%<br>Conservation ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Invariants</h3>
+    <ul class="bullets">
+      <li><strong>INV-BALANCE:</strong> <code>TVL_sr + TVL_mz + TVL_jr + reserve ≡ Strategy.totalAssets()</code></li>
+      <li><strong>INV-PRIORITY:</strong> <code>Y_sr</code> computed before <code>Y_mz</code> and <code>Y_jr</code>, order cannot be reversed</li>
+      <li><strong>INV-SENIOR-LIQUID:</strong> Senior withdrawal is always NONE, hardcoded</li>
+      <li><strong>INV-LOSS-ORDER:</strong> Capital losses absorb Junior → Mezzanine → Senior, no skip, no reorder</li>
+      <li><strong>INV-CONSERVATION:</strong> <code>Y_sr + Y_mz + Y_jr = netGain</code>, enforced in both cases</li>
+      <li><strong>INV-APY-FLOOR:</strong> APY ≥ −100% for all tranches, enforced by <code>MAX(0, …)</code> in capacities</li>
+      <li><strong>INV-RP-BOUND:</strong> <code>RP_nominal &lt; 100%</code>, enforced by <code>x_sr + y_sr ≤ 80%</code></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     USER FLOWS
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="user-flows" class="panel">
+  <div class="section">
+    <h2>User flows</h2>
+    <p>Step-by-step user journeys through the protocol. Each flow shows actors, contract calls, and state transitions.</p>
+  </div>
+
+  <div class="section">
+    <h3>Deposit into a tranche</h3>
+    <div class="stepper" data-flow="user-deposit">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Withdraw via SHARES_LOCK (CR-restricted)</h3>
+    <div class="stepper" data-flow="user-shares-lock">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Instant withdraw (CR healthy)</h3>
+    <div class="stepper" data-flow="user-instant">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     ADMIN FLOWS
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="admin-flows" class="panel">
+  <div class="section">
+    <h2>Admin flows</h2>
+    <p>Privileged operations. Each flow gates on a specific ACM role.</p>
+  </div>
+
+  <div class="section">
+    <h3>Pause a tranche (emergency)</h3>
+    <div class="stepper" data-flow="admin-pause">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Update cooldown ranges</h3>
+    <div class="stepper" data-flow="admin-cooldown">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Drain reserve to treasury</h3>
+    <div class="stepper" data-flow="admin-reserve">
+      <div class="step-nav"></div>
+      <div class="step-content"></div>
+      <div class="step-nav-buttons">
+        <button class="btn step-prev"><i class="ti ti-chevron-left"></i> Previous</button>
+        <button class="btn step-next">Next <i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     GLOSSARY
+     ════════════════════════════════════════════════════════════════════════ -->
+<div id="glossary" class="panel">
+  <div class="section">
+    <h2>Glossary</h2>
+    <table class="info-table">
+      <thead>
+        <tr><th>Term</th><th>Definition</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>sUSDai</code></td><td>Staked USDai. ERC-4626 vault token. Earns yield from GPU-backed loans. Atrium holds this as the yield-bearing form.</td></tr>
+        <tr><td><code>USDai</code></td><td>USD.AI base stablecoin. Auto-stakes into sUSDai on deposit.</td></tr>
+        <tr><td><code>srUSDai / mzUSDai / jrUSDai</code></td><td>Tranche vault share tokens, one per tranche.</td></tr>
+        <tr><td><code>BaseAPY</code></td><td>Distributable APY after reserve cut. Drives all yield calculations.</td></tr>
+        <tr><td><code>RP_nominal</code></td><td>Risk Premium rate from the curve, the rate Senior commits to.</td></tr>
+        <tr><td><code>RP_delivered</code></td><td>Risk Premium amount actually flowing to sub. Equals nominal when floor inactive; reduced when floor binds.</td></tr>
+        <tr><td><code>Sub_APY</code></td><td>Yield rate received by the sub pool in Case 1. Equals BaseAPY in ideal case; lower when yield compressed.</td></tr>
+        <tr><td><code>α (alpha)</code></td><td>Junior priority multiplier in RP distribution. Default 2.5×.</td></tr>
+        <tr><td><code>CR_SR</code></td><td>Coverage ratio, <code>pool / TVL_sr</code>. Primary health indicator.</td></tr>
+        <tr><td><code>SHARES_LOCK</code></td><td>Cooldown mode where tranche shares are escrowed and NAV floats until claim. Only cooldown mode in V2.</td></tr>
+        <tr><td><code>floor_sr</code></td><td>Governance-set Senior minimum yield. 48-hour timelock on changes.</td></tr>
+        <tr><td><code>reserveBps</code></td><td>Protocol reserve cut, basis points. Default 500 (5%) on positive gains.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+const flows = {
+  'user-deposit': [
+    {
+      title: 'User initiates deposit',
+      actor: 'User wallet',
+      body: 'User picks a tranche (Sr / Mz / Jr) and calls Tranche.deposit with either USDai or sUSDai.',
+      code: 'tranche.deposit(USDai, amount, receiver)'
+    },
+    {
+      title: 'Tranche routes to AtriumCDO',
+      actor: 'Tranche → AtriumCDO',
+      body: 'Tranche forwards the deposit to AtriumCDO which orchestrates the strategy interaction.',
+    },
+    {
+      title: 'Strategy auto-stakes if USDai',
+      actor: 'AtriumCDO → UsdaiStrategy',
+      body: 'If user deposited USDai, Strategy auto-stakes into sUSDai. If user deposited sUSDai directly, the deposit is held as-is. Protocol always holds yield-bearing form.',
+      code: 'usdaiStrategy.deposit(token, amount)'
+    },
+    {
+      title: 'Accounting updates TVL',
+      actor: 'AtriumCDO → Accounting',
+      body: 'Accounting increments the tranche TVL based on baseAssets (USDai-equivalent), not raw token amount.',
+      code: 'accounting.updateBalanceFlow(tranche, +baseAmount)'
+    },
+    {
+      title: 'Shares minted',
+      actor: 'Tranche',
+      body: 'Shares minted to user at current share price. Share price reflects sUSDai\'s accumulated yield since last settlement.',
+      code: 'tranche._mint(receiver, shares)'
+    },
+    {
+      title: 'User holds tranche shares',
+      actor: 'User wallet',
+      body: 'User now holds srUSDai / mzUSDai / jrUSDai. Earns according to tranche profile. Loss-protected by tranches below.'
+    }
+  ],
+  'user-shares-lock': [
+    {
+      title: 'User requests withdrawal',
+      actor: 'User wallet',
+      body: 'User calls Tranche.requestRedeem on Mz or Jr while CR_SR is in Monitoring or Warning zone.',
+      code: 'tranche.requestRedeem(shares, receiver, owner)'
+    },
+    {
+      title: 'CR check determines mode',
+      actor: 'Tranche → SharesCooldown',
+      body: 'Mode resolved at request time. Sub tranches in Monitoring (1.10–1.20×) → SHARES_LOCK short. Warning (&lt; 1.10×) → SHARES_LOCK long.',
+      code: 'mode = SHARES_LOCK · duration = short or long'
+    },
+    {
+      title: 'Shares transferred to silo',
+      actor: 'Tranche → SharesCooldown',
+      body: 'IMPORTANT: shares are TRANSFERRED to the silo, not burned. They continue accruing yield while locked. NAV continues to float during the lock period.',
+      code: 'tranche._transfer(owner, silo, shares)'
+    },
+    {
+      title: 'Cooldown timer runs',
+      actor: 'System state',
+      body: 'Timer counts down. User cannot claim before expiry. User can cancel and reclaim shares at any time (free).'
+    },
+    {
+      title: 'User claims after expiry',
+      actor: 'User wallet → SharesCooldown',
+      body: 'User calls finalize. Silo burns shares and pays out at the CURRENT NAV (not request-time NAV). Both exiting and remaining depositors share the same economic outcome.',
+      code: 'silo.finalize(requestId)'
+    },
+    {
+      title: 'sUSDai delivered',
+      actor: 'User wallet',
+      body: 'User receives sUSDai based on current exchange rate. If user requested USDai output, additional USD.AI ERC-7540 unstake queue applies.'
+    }
+  ],
+  'user-instant': [
+    {
+      title: 'User requests withdrawal',
+      actor: 'User wallet',
+      body: 'User calls Tranche.requestRedeem. CR_SR is in Normal zone (&gt; 1.20×) for sub, or any zone for Senior.',
+      code: 'tranche.requestRedeem(shares, receiver, owner)'
+    },
+    {
+      title: 'Mode is NONE',
+      actor: 'Tranche → RedemptionPolicy',
+      body: 'No cooldown required. Shares burned immediately, withdrawal processed in single transaction.',
+      code: 'mode = NONE'
+    },
+    {
+      title: 'Strategy releases sUSDai',
+      actor: 'Tranche → UsdaiStrategy',
+      body: 'Strategy releases sUSDai equivalent to the burned shares\' baseAmount.',
+      code: 'usdaiStrategy.withdraw(sUSDai, baseAmount)'
+    },
+    {
+      title: 'Accounting updates TVL',
+      actor: 'AtriumCDO → Accounting',
+      body: 'Tranche TVL decremented by baseAmount.',
+      code: 'accounting.updateBalanceFlow(tranche, −baseAmount)'
+    },
+    {
+      title: 'User receives sUSDai',
+      actor: 'User wallet',
+      body: 'User receives sUSDai in single transaction. For USDai output, user must additionally call sUSDai.requestRedeem to enter USD.AI epoch queue.'
+    }
+  ],
+  'admin-pause': [
+    {
+      title: 'Incident detected',
+      actor: 'Monitoring system',
+      body: 'Suspicious activity detected, e.g. large withdrawal attempt, oracle anomaly, protocol exploit attempt. Operator decides to pause.'
+    },
+    {
+      title: 'Pauser calls setActionStates',
+      actor: 'Pauser multisig → CDO',
+      body: 'Multi-sig signs setActionStates. Can target one tranche or all (pass address(0)).',
+      code: 'cdo.setActionStates(srVault, false, false)'
+    },
+    {
+      title: 'ACM verifies PAUSER_ROLE',
+      actor: 'CDO → ACM',
+      body: 'onlyRole(PAUSER_ROLE) calls acm.hasRole. ACM returns true for the multisig.',
+      code: 'acm.hasRole(PAUSER_ROLE, multisig) → true'
+    },
+    {
+      title: 'CDO updates action state',
+      actor: 'CDO storage',
+      body: 'actionsSr.isDepositEnabled = false. actionsSr.isWithdrawEnabled = false. Events emitted for indexers.',
+      code: 'emit DepositsStateChanged + WithdrawalsStateChanged'
+    },
+    {
+      title: 'Operations revert',
+      actor: 'System state',
+      body: 'Any user call to deposit / withdraw on the paused tranche immediately reverts with DepositsDisabled or WithdrawalsDisabled.'
+    },
+    {
+      title: 'Investigation and unpause',
+      actor: 'Risk team',
+      body: 'Once issue resolved, multisig calls setActionStates(vault, true, true) to restore operations.'
+    }
+  ],
+  'admin-cooldown': [
+    {
+      title: 'Risk team observes data',
+      actor: 'Risk analyst',
+      body: 'Backtesting shows current cooldown ranges are too aggressive (users churning out) or too lax (CR_SR slips below targets). Team designs new ranges.'
+    },
+    {
+      title: 'Updater proposes config',
+      actor: 'Risk multisig → SharesCooldown',
+      body: 'Multi-sig calls setVaultExitConfig for the target tranche. Passes ranges (CR thresholds + durations).',
+      code: 'silo.setVaultExitConfig(jrVault, ranges)'
+    },
+    {
+      title: 'ACM verifies UPDATER_CDO_APR_ROLE',
+      actor: 'SharesCooldown → ACM',
+      body: 'Modifier check passes. State write proceeds.'
+    },
+    {
+      title: 'New ranges active',
+      actor: 'SharesCooldown storage',
+      body: 'All future withdrawals use new ranges. Existing in-flight requests are unaffected (already encoded with prior parameters).'
+    },
+    {
+      title: 'Monitor impact',
+      actor: 'Risk team',
+      body: 'Watch withdrawal patterns over next 7–30 days. Iterate if needed.'
+    }
+  ],
+  'admin-reserve': [
+    {
+      title: 'Reserve accumulated',
+      actor: 'System state',
+      body: 'Fees from withdrawal modes and early-exit fees have grown the reserve bucket in Accounting.'
+    },
+    {
+      title: 'Reserve manager initiates',
+      actor: 'Reserve manager → CDO',
+      body: 'Multi-sig calls reduceReserve specifying token (sUSDai) and amount to drain.',
+      code: 'cdo.reduceReserve(sUSDai, amount)'
+    },
+    {
+      title: 'CDO converts amount',
+      actor: 'CDO → Strategy',
+      body: 'CDO uses strategy.convertToAssets to translate tokenAmount into baseAssets (USDai equivalent).',
+      code: 'baseAssets = strategy.convertToAssets(sUSDai, amount)'
+    },
+    {
+      title: 'Accounting decrements reserve',
+      actor: 'CDO → Accounting',
+      body: 'Reserve bucket decreases. Distribution arrays = (0, 0, 0), all goes to treasury, none redistributed to tranches.',
+      code: 'accounting.reduceReserve(baseAssets, 0, 0, 0)'
+    },
+    {
+      title: 'Strategy releases tokens',
+      actor: 'CDO → Strategy → ERC20Cooldown',
+      body: 'Strategy routes through ERC20Cooldown with cooldown = 0 (pass-through). Tokens flow to treasury address.',
+      code: 'erc20Cooldown.transfer(sUSDai, treasury, treasury, amount, 0)'
+    },
+    {
+      title: 'Treasury receives sUSDai',
+      actor: 'Treasury wallet',
+      body: 'Treasury can hold, unstake, or distribute as per governance.'
+    }
+  ]
+};
+
+const tabs = document.querySelectorAll('.tab-btn');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabs.forEach(b => b.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+document.querySelectorAll('.stepper').forEach(stepper => {
+  const flowKey = stepper.dataset.flow;
+  const steps = flows[flowKey];
+  if (!steps) return;
+
+  const nav = stepper.querySelector('.step-nav');
+  const content = stepper.querySelector('.step-content');
+  const prevBtn = stepper.querySelector('.step-prev');
+  const nextBtn = stepper.querySelector('.step-next');
+  let current = 0;
+
+  steps.forEach((step, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'step-dot' + (i === 0 ? ' active' : '');
+    dot.textContent = (i + 1);
+    dot.addEventListener('click', () => goTo(i));
+    nav.appendChild(dot);
+
+    const panel = document.createElement('div');
+    panel.className = 'step-panel' + (i === 0 ? ' active' : '');
+    panel.innerHTML = `
+      <div class="step-actor"><i class="ti ti-circle-dot"></i>${step.actor}</div>
+      <div class="step-title"><i class="ti ti-${getIcon(i, steps.length)}"></i> Step ${i+1}: ${step.title}</div>
+      <div class="step-body">${step.body}</div>
+      ${step.code ? `<div class="code-line">${step.code}</div>` : ''}
+    `;
+    content.appendChild(panel);
+  });
+
+  function getIcon(i, total) {
+    if (i === 0) return 'player-play';
+    if (i === total - 1) return 'circle-check';
+    return 'arrow-right';
+  }
+
+  function goTo(idx) {
+    current = idx;
+    nav.querySelectorAll('.step-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    content.querySelectorAll('.step-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === steps.length - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(Math.max(0, current - 1)));
+  nextBtn.addEventListener('click', () => goTo(Math.min(steps.length - 1, current + 1)));
+
+  // Initial state
+  prevBtn.disabled = true;
+  if (steps.length === 1) nextBtn.disabled = true;
+});
+</script>
+
+</body>
+</html>
